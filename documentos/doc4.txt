@@ -1,0 +1,1 @@
+Árvores binárias de busca balanceadas como a árvore AVL realizam rotações simples e duplas para manter a complexidade logarítmica.

@@ -1,0 +1,1 @@
+Em ciência da computação, estrutura de dados como árvores AVL e tabelas hash são essenciais para busca eficiente e desempenho de algoritmos.

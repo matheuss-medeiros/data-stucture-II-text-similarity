@@ -1,0 +1,1 @@
+Estrutura de dados é essencial em ciência da computação. Árvores AVL e tabelas hash garantem busca eficiente e alto desempenho em algoritmos.

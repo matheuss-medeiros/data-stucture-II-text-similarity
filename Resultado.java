@@ -23,12 +23,8 @@ public class Resultado {
         return similaridade;
     }
 
-    public boolean contemDocumento(String nomeDoc) {
-        return documento1.equalsIgnoreCase(nomeDoc) || documento2.equalsIgnoreCase(nomeDoc);
-    }
-
     @Override
     public String toString() {
-        return String.format(Locale.US, "%s e %s = %.2f", documento1, documento2, similaridade);
+        return String.format(Locale.US, "%s <-> %s = %.2f", documento1, documento2, similaridade);
     }
 }

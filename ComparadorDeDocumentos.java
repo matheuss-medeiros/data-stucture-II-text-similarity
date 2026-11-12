@@ -1,10 +1,15 @@
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class ComparadorDeDocumentos {
 
-    public static double calcularCosseno(HashTable tabelaA, HashTable tabelaB) {
+    /**
+     * Recebe dois objetos Documento e retorna a Similaridade de Cosseno entre eles.
+     * Fórmula: cos(theta) = (A . B) / (||A|| * ||B||)
+     */
+    public static double calcularCosseno(Documento docA, Documento docB) {
+        HashTable tabelaA = docA.getTabelaFrequencias();
+        HashTable tabelaB = docB.getTabelaFrequencias();
+
         List<String> palavrasA = tabelaA.getPalavras();
         List<String> palavrasB = tabelaB.getPalavras();
 
@@ -17,14 +22,14 @@ public class ComparadorDeDocumentos {
         double somaQuadradosB = 0.0;
 
         for (String palavra : palavrasA) {
-            int freqA = tabelaA.buscarFrequencia(palavra);
-            int freqB = tabelaB.buscarFrequencia(palavra);
+            int freqA = tabelaA.get(palavra);
+            int freqB = tabelaB.get(palavra);
             produtoEscalar += (double) freqA * freqB;
             somaQuadradosA += (double) freqA * freqA;
         }
 
         for (String palavra : palavrasB) {
-            int freqB = tabelaB.buscarFrequencia(palavra);
+            int freqB = tabelaB.get(palavra);
             somaQuadradosB += (double) freqB * freqB;
         }
 
@@ -34,29 +39,5 @@ public class ComparadorDeDocumentos {
         }
 
         return produtoEscalar / denominador;
-    }
-
-    public static double calcularJaccard(HashTable tabelaA, HashTable tabelaB) {
-        List<String> palavrasA = tabelaA.getPalavras();
-        List<String> palavrasB = tabelaB.getPalavras();
-
-        if (palavrasA.isEmpty() && palavrasB.isEmpty()) {
-            return 1.0;
-        }
-        if (palavrasA.isEmpty() || palavrasB.isEmpty()) {
-            return 0.0;
-        }
-
-        Set<String> uniao = new HashSet<>(palavrasA);
-        uniao.addAll(palavrasB);
-
-        int intersecao = 0;
-        for (String palavra : palavrasA) {
-            if (tabelaB.buscarFrequencia(palavra) > 0) {
-                intersecao++;
-            }
-        }
-
-        return (double) intersecao / uniao.size();
     }
 }

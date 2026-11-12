@@ -1,21 +1,24 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class HashTable {
-    
-    public class No {
+
+    public static class No {
         public String palavra;
         public int frequencia;
         public No proximo;
 
-        public No(String palavra) {
+        public No(String palavra, int frequencia) {
             this.palavra = palavra;
-            this.frequencia = 1;
+            this.frequencia = frequencia;
             this.proximo = null;
         }
     }
 
-    private No[] tabela;
-    private int capacidade;
+    private final No[] tabela;
+    private final int capacidade;
     private int totalColisoes;
-    private int tipoHash; // 1 para DJB2 (Multiplicativo com shift), 2 para Polinomial
+    private final int tipoHash; // 1 = hashMultiplicativo, 2 = hashPolinomial
 
     public HashTable(int capacidade, int tipoHash) {
         this.capacidade = capacidade;
@@ -24,16 +27,23 @@ public class HashTable {
         this.tipoHash = tipoHash;
     }
 
-    public void put(String palavra) {
-        int indice = (tipoHash == 1) ? hashDJB2(palavra) : hashPolinomial(palavra);
-        
+    /**
+     * Insere ou atualiza o par (chave, valor) na Tabela Hash.
+     * Tratamento de colisões: Encadeamento Separado (Separate Chaining).
+     * Quando duas chaves distintas mapeiam para o mesmo índice (bucket), a nova
+     * chave é adicionada ao final da lista encadeada daquele índice e o contador
+     * de colisões é incrementado.
+     */
+    public void put(String chave, int valor) {
+        int indice = calcularHash(chave);
+
         if (tabela[indice] == null) {
-            tabela[indice] = new No(palavra);
+            tabela[indice] = new No(chave, valor);
         } else {
             No atual = tabela[indice];
             while (true) {
-                if (atual.palavra.equals(palavra)) {
-                    atual.frequencia++; // Palavra já existe, apenas incrementa
+                if (atual.palavra.equals(chave)) {
+                    atual.frequencia = valor; // Atualiza valor de chave já existente
                     return;
                 }
                 if (atual.proximo == null) {
@@ -41,34 +51,70 @@ public class HashTable {
                 }
                 atual = atual.proximo;
             }
-            // Chegou ao fim da lista encadeada sem achar a palavra (ocorreu uma colisão)
+            // Ocorreu colisão com outra(s) palavra(s) no mesmo bucket
             totalColisoes++;
-            atual.proximo = new No(palavra);
+            atual.proximo = new No(chave, valor);
         }
     }
 
-    public int getFrequencia(String palavra) {
-        int indice = (tipoHash == 1) ? hashDJB2(palavra) : hashPolinomial(palavra);
+    /**
+     * Sobrecarga auxiliar que incrementa diretamente em 1 a frequência da chave.
+     */
+    public void put(String chave) {
+        put(chave, get(chave) + 1);
+    }
+
+    /**
+     * Retorna a frequência associada à chave na Tabela Hash, ou 0 caso não exista.
+     */
+    public int get(String chave) {
+        int indice = calcularHash(chave);
         No atual = tabela[indice];
         while (atual != null) {
-            if (atual.palavra.equals(palavra)) {
+            if (atual.palavra.equals(chave)) {
                 return atual.frequencia;
             }
             atual = atual.proximo;
         }
-        return 0; // Não encontrou
+        return 0;
     }
 
-    // Função 1: Algoritmo DJB2 (Multiplicativo com shift de bits)
-    private int hashDJB2(String palavra) {
+    /**
+     * Retorna todas as palavras únicas armazenadas na Tabela Hash.
+     */
+    public List<String> getPalavras() {
+        List<String> palavras = new ArrayList<>();
+        for (int i = 0; i < capacidade; i++) {
+            No atual = tabela[i];
+            while (atual != null) {
+                palavras.add(atual.palavra);
+                atual = atual.proximo;
+            }
+        }
+        return palavras;
+    }
+
+    private int calcularHash(String chave) {
+        return (tipoHash == 1) ? hashMultiplicativo(chave) : hashPolinomial(chave);
+    }
+
+    /**
+     * Função de Dispersão 1: hashMultiplicativo (baseado em DJB2).
+     * Parte da constante prima 5381 e multiplica o acumulador por 33 a cada caractere
+     * usando deslocamento de bits ((hash << 5) + hash) somado ao código Unicode do caractere.
+     */
+    private int hashMultiplicativo(String palavra) {
         long hash = 5381;
         for (int i = 0; i < palavra.length(); i++) {
-            hash = ((hash << 5) + hash) + palavra.charAt(i); // hash * 33 + c
+            hash = ((hash << 5) + hash) + palavra.charAt(i);
         }
         return (int) (Math.abs(hash) % capacidade);
     }
 
-    // Função 2: Polinomial clássica (base 31)
+    /**
+     * Função de Dispersão 2: hashPolinomial (base primo 31 via Regra de Horner).
+     * Avalia o polinômio dos caracteres da string aplicando módulo a cada passo.
+     */
     private int hashPolinomial(String palavra) {
         long hash = 0;
         for (int i = 0; i < palavra.length(); i++) {
@@ -84,7 +130,7 @@ public class HashTable {
     public No[] getTabela() {
         return tabela;
     }
-    
+
     public int getCapacidade() {
         return capacidade;
     }
