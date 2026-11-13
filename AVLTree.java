@@ -5,37 +5,6 @@ public class AVLTree {
     private static final double EPSILON = 1e-9;
 
     /**
-     * Nó interno da Árvore AVL que armazena a similaridade como chave e uma lista
-     * de pares de documentos (Resultado) associados àquela mesma similaridade.
-     */
-    public static class NoAVL {
-        private final double chave;
-        private final List<Resultado> resultados;
-        private NoAVL esquerda;
-        private NoAVL direita;
-        private int altura;
-
-        public NoAVL(Resultado resultado) {
-            this.chave = resultado.getSimilaridade();
-            this.resultados = new ArrayList<>();
-            this.resultados.add(resultado);
-            this.esquerda = null;
-            this.direita = null;
-            this.altura = 1;
-        }
-
-        public double getChave() { return chave; }
-        public List<Resultado> getResultados() { return resultados; }
-        public void adicionarResultado(Resultado r) { this.resultados.add(r); }
-        public NoAVL getEsquerda() { return esquerda; }
-        public void setEsquerda(NoAVL esquerda) { this.esquerda = esquerda; }
-        public NoAVL getDireita() { return direita; }
-        public void setDireita(NoAVL direita) { this.direita = direita; }
-        public int getAltura() { return altura; }
-        public void setAltura(int altura) { this.altura = altura; }
-    }
-
-    /**
      * Registro retornado pelo método de inserção que quantifica as rotações
      * (Simples Esquerda/Direita, Dupla Esquerda/Direita) realizadas na operação.
      */
